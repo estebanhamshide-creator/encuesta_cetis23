@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Encuesta CETIS 23</title>
+<style>
+body { font-family: Arial; margin: 20px; }
+h1 { color: #2c3e50; }
+button { padding: 10px; margin-top: 10px; }
+.resultado { margin-top: 20px; background: #f4f4f4; padding: 10px; }
+</style>
+</head>
+
+<body>
+
+<h1>Encuesta CETIS 23</h1>
+
+<form id="encuesta">
+
+<h3>1. Estado de pavimentación</h3>
+<select name="pavimento">
+<option>Bueno</option>
+<option>Regular</option>
+<option>Malo</option>
+</select>
+
+<h3>2. ¿Afecta movilidad?</h3>
+<input type="radio" name="movilidad" value="Si"> Sí
+<input type="radio" name="movilidad" value="No"> No
+
+<h3>3. ¿Accidentes?</h3>
+<input type="radio" name="accidente" value="Si"> Sí
+<input type="radio" name="accidente" value="No"> No
+
+<h3>4. Problemas observados</h3>
+<textarea name="problemas"></textarea>
+
+<h3>5. ¿Afecta derechos humanos?</h3>
+<input type="radio" name="derechos" value="Si"> Sí
+<input type="radio" name="derechos" value="No"> No
+
+<h3>6. ¿Desigualdad urbana?</h3>
+<input type="radio" name="desigualdad" value="Si"> Sí
+<input type="radio" name="desigualdad" value="No"> No
+
+<h3>7. Soluciones</h3>
+<textarea name="soluciones"></textarea>
+
+<br><br>
+<button type="button" onclick="guardar()">Guardar respuesta</button>
+
+</form>
+
+<div class="resultado" id="resultado"></div>
+
+<script>
+
+let respuestas = JSON.parse(localStorage.getItem("respuestas")) || [];
+
+function guardar() {
+    let form = document.forms["encuesta"];
+    let data = {
+        pavimento: form.pavimento.value,
+        movilidad: form.movilidad.value,
+        accidente: form.accidente.value,
+        derechos: form.derechos.value,
+        desigualdad: form.desigualdad.value
+    };
+
+    respuestas.push(data);
+    localStorage.setItem("respuestas", JSON.stringify(respuestas));
+
+    generarReporte();
+}
+
+function generarReporte() {
+    let total = respuestas.length;
+    let conteo = { bueno:0, regular:0, malo:0 };
+
+    respuestas.forEach(r => {
+        if(r.pavimento == "Bueno") conteo.bueno++;
+        if(r.pavimento == "Regular") conteo.regular++;
+        if(r.pavimento == "Malo") conteo.malo++;
+    });
+
+    let html = "<h2>Reporte</h2>";
+    html += "<p>Total respuestas: " + total + "</p>";
+    html += "<p>Bueno: " + porcentaje(conteo.bueno, total) + "%</p>";
+    html += "<p>Regular: " + porcentaje(conteo.regular, total) + "%</p>";
+    html += "<p>Malo: " + porcentaje(conteo.malo, total) + "%</p>";
+
+    document.getElementById("resultado").innerHTML = html;
+}
+
+function porcentaje(valor, total) {
+    return total ? ((valor/total)*100).toFixed(1) : 0;
+}
+
+generarReporte();
+
+</script>
+
+</body>
+</html>
